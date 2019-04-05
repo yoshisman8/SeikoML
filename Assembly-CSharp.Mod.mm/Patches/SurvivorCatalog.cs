@@ -15,44 +15,16 @@ namespace RoR2
 		[MonoModConstructor]
 		private static void cctor()
 		{
-			idealSurvivorOrder = new SurvivorIndex[]{
-				SurvivorIndex.Commando,
-				SurvivorIndex.Toolbot,
-				SurvivorIndex.Huntress,
-				SurvivorIndex.Bandit,
-				SurvivorIndex.Engineer,
-				SurvivorIndex.Mage,
-				SurvivorIndex.Merc,
-				(SurvivorIndex)7,
-				(SurvivorIndex)8,
-				(SurvivorIndex)9,
-				(SurvivorIndex)10,
-				(SurvivorIndex)11,
-				(SurvivorIndex)12,
-				(SurvivorIndex)13,
-				(SurvivorIndex)14,
-				(SurvivorIndex)15,
-				(SurvivorIndex)16,
-				(SurvivorIndex)17,
-				(SurvivorIndex)18,
-				(SurvivorIndex)19,
-				(SurvivorIndex)20,
-				(SurvivorIndex)21,
-				(SurvivorIndex)22,
-				(SurvivorIndex)23
-			};
-			survivorMaxCount = 24;
+            orig_cctor();
+            idealSurvivorOrder = BaseFramework.BuildIdealOrder(idealSurvivorOrder);
 		}
 
-		private static extern void orig_RegisterSurvivor(SurvivorIndex survivorIndex, SurvivorDef survivorDef);
-		[MonoModPublic]
-		public static void RegisterSurvivor(SurvivorIndex survivorIndex, SurvivorDef survivorDef)
-		{
-			orig_RegisterSurvivor(survivorIndex, survivorDef);
-		}
+
+        [MonoModIgnore,MonoModPublic]
+        public extern static void RegisterSurvivor(SurvivorIndex survivorIndex, SurvivorDef survivorDef);
 
 		public static SurvivorDef GetSurvivorDef(SurvivorIndex survivorIndex){
-			if (survivorIndex < SurvivorIndex.Commando || survivorIndex > (SurvivorIndex)24)
+			if (survivorIndex < 0 || survivorIndex > (SurvivorIndex)SurvivorCatalog.survivorDefs.Count())
 			{
 				return null;
 			}
@@ -65,7 +37,7 @@ namespace RoR2
 		})]
 		[MonoModReplace]
 		private static void Init(){
-			SurvivorCatalog.survivorDefs = new SurvivorDef[24];
+			SurvivorCatalog.survivorDefs = new SurvivorDef[BaseFramework.SurvivorCount];
 			SurvivorCatalog.RegisterSurvivor(SurvivorIndex.Commando, new SurvivorDef
 			{
 				bodyPrefab = BodyCatalog.FindBodyPrefab("CommandoBody"),
@@ -114,7 +86,7 @@ namespace RoR2
 				unlockableName = "Characters.Mercenary"
 			});
 			BaseFramework.addSurvivors();
-			for (SurvivorIndex survivorIndex = SurvivorIndex.Commando; survivorIndex < (SurvivorIndex)patch_SurvivorIndex.Count; survivorIndex++)
+			for (SurvivorIndex survivorIndex = 0; survivorIndex < (SurvivorIndex)SurvivorCatalog.survivorDefs.Count(); survivorIndex++)
 			{
 				if (SurvivorCatalog.survivorDefs[(int)survivorIndex] == null)
 				{
@@ -132,7 +104,11 @@ namespace RoR2
 			{
 				while (enumerator.MoveNext())
 				{
-				}
+                    SurvivorDef survivor = new SurvivorDef();
+                    survivor = enumerator.Current;
+                    ViewablesCatalog.Node survivorEntryNode = new ViewablesCatalog.Node(survivor.survivorIndex.ToString(), false, node);
+                    survivorEntryNode.shouldShowUnviewed = ((UserProfile userProfile) => !userProfile.HasViewedViewable(survivorEntryNode.fullName) && userProfile.HasSurvivorUnlocked(survivor.survivorIndex) && !string.IsNullOrEmpty(survivor.unlockableName));
+                }
 			}
 			ViewablesCatalog.AddNodeToRoot(node);
 		}

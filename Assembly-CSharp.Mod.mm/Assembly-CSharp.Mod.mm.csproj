@@ -10,6 +10,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RoR2ModFramework\RoR2ModFramework.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\lib-stripped\Assembly-CSharp.dll</HintPath>
       <Private>false</Private>
@@ -43,9 +47,6 @@
     </Reference>
     <Reference Include="Rewired_Windows_Lib">
       <HintPath>..\lib-stripped\Rewired_Windows_Lib.dll</HintPath>
-    </Reference>
-    <Reference Include="RoR2-ModFramework">
-      <HintPath>..\lib-stripped\RoR2-ModFramework.dll</HintPath>
     </Reference>
     <Reference Include="TextMeshPro-1.0.55.2017.1.0b11">
       <HintPath>..\lib-stripped\TextMeshPro-1.0.55.2017.1.0b11.dll</HintPath>
